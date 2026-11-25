@@ -1,0 +1,28 @@
+# =====================================================================================================================
+# KubeVirt v1.9.1 virtctl: the ONLINE vendor step (drive.py assemble_kit: docker build -f Dockerfile.vendor
+# --target export, then the export stage's filesystem becomes vendored/). It clones KubeVirt at the pinned commit
+# (the tag must point to it) into vendored/virtctl-src, then fills vendored/bazel-repository-cache: every RPM of the
+# x86_64 CentOS Stream 9 trees by sha256 (WORKSPACE URL, KubeVirt's builddeps mirror or the CentOS Stream Koji;
+# vendored/rpm-sources.json says which served each), and what `bazel build --nobuild //cmd/virtctl:virtctl-amd64` fetches (Go SDK,
+# rules, distroless base, libssl3 .deb), keeping only the RPMs this image uses. Written by mk-kits.py; never edit.
+# =====================================================================================================================
+FROM quay.io/kubevirt/builder:2606231619-4fe2cd536f@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8 AS vendor
+ARG KUBEVIRT_VERSION=v1.9.1
+ARG KUBEVIRT_COMMIT=c3d19093f9c7b843b3879b18dc088911c081c39e
+ARG SOURCE_DATE_EPOCH=1791523273
+COPY patches/ /kvs/kit/patches/
+COPY vendor/ /kvs/kit/vendor/
+COPY kubevirt-build.sh oci-rootfs.py gen_rpmdb.py kubevirt-pins.env /kvs/kit/
+RUN git clone -q --no-checkout --filter=blob:none https://github.com/kubevirt/kubevirt.git /tmp/kubevirt && \
+    git -C /tmp/kubevirt checkout -q "$KUBEVIRT_COMMIT" && \
+    test "$(git -C /tmp/kubevirt rev-parse HEAD)" = "$KUBEVIRT_COMMIT" && \
+    test "$(git -C /tmp/kubevirt rev-parse "refs/tags/$KUBEVIRT_VERSION^{commit}")" = "$KUBEVIRT_COMMIT" && \
+    mkdir -p /export/virtctl-src && git -C /tmp/kubevirt archive "$KUBEVIRT_COMMIT" | tar -x -C /export/virtctl-src && \
+    rm -rf /tmp/kubevirt
+RUN mkdir -p /root/go/src/kubevirt.io/kubevirt /export/bazel-repository-cache && \
+    cp -a /export/virtctl-src/. /root/go/src/kubevirt.io/kubevirt/ && \
+    KVS_REPO_CACHE=/export/bazel-repository-cache bash /kvs/kit/kubevirt-build.sh fetch virtctl && \
+    rm -rf /root/go/src/kubevirt.io/kubevirt
+
+FROM scratch AS export
+COPY --from=vendor /export/ /

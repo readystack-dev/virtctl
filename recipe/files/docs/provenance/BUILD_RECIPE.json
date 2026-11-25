@@ -1,0 +1,42 @@
+{
+  "schema": "kitforge.build_recipe.v1",
+  "slug": "virtctl",
+  "image": "readystack/virtctl:v1.9.1-CE-scratch-r2",
+  "build_method": "source-rebuild-go",
+  "source": {
+    "repo": "https://github.com/kubevirt/kubevirt",
+    "ref": "v1.9.1",
+    "commit": "c3d19093f9c7b843b3879b18dc088911c081c39e",
+    "source_date_epoch": 1791523273,
+    "source_date_epoch_provenance": "committer date of c3d19093f9c7b843b3879b18dc088911c081c39e, the commit tag v1.9.1 points to (2026-10-09T05:21:13Z), as registry/stacks/kubevirt-stack.json pins it.",
+    "builder_image": "quay.io/kubevirt/builder:2606231619-4fe2cd536f@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8",
+    "builder_note": "KubeVirt's own builder at v1.9.1 (hack/dockerized kubevirt_builder_version 2606231619-4fe2cd536f; CentOS Stream 9, Bazel 6.5.0), pinned by its linux/amd64 manifest digest and carried in the kit as an OCI layout (bases/).",
+    "bazel_target": "//cmd/virtctl:virtctl-amd64",
+    "go_sdk": "go1.26.10.linux-amd64.tar.gz sha256 ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5 (KubeVirt v1.9.1 pins 1.26.4; raised in its Bazel Go SDK pin only, patch 0001)",
+    "patches": [
+      {
+        "file": "0001-go-sdk-1.26.10.patch",
+        "why": "Go SDK pinned by file + sha256 (go1.26.10): offline fetch, and the stack's one Go toolchain; clears the 3 critical + 15 high Go stdlib findings of 1.26.4"
+      },
+      {
+        "file": "0002-rpm-bumps-cs9-x86_64.patch",
+        "why": "RPM bumps in KubeVirt's own lock (x86_64 CentOS Stream 9): openssl 3.5.9-1, pcre2 10.40-7, ca-certificates 2026.2.92-91.3, libevent 2.1.13-1, libpcap 1.10.0-5, xz 5.2.5-10 (product-kits/kubevirt-stack/kubevirt/rpm-bumps.tsv has each CVE)"
+      },
+      {
+        "file": "0003-rpmdb-layer.patch",
+        "why": "an RPM database (rpm --justdb) of exactly each image's rpmtree, so scanners see the CentOS Stream packages"
+      },
+      {
+        "file": "0004-virt-handler-nonroot-default-user.patch",
+        "why": "virt-handler image defaults to uid 107; root comes from the pod (KubeVirt CR customizeComponents)"
+      },
+      {
+        "file": "0005-distroless-libssl3-3.0.22-1-deb12u2.patch",
+        "why": "libssl3 3.0.22-1~deb12u2 over the distroless base (CVE-2026-75803 critical + 4 high); remove when distroless ships it"
+      }
+    ],
+    "vendor_committed": true
+  },
+  "binaries_from_source": null,
+  "runtime_packages": null
+}

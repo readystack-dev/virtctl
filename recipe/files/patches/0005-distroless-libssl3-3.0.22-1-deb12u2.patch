@@ -1,0 +1,137 @@
+ReadyStack 0005: libssl3 3.0.22-1~deb12u2 (bookworm-security) over the distroless base, in all five images.
+
+gcr.io/distroless/base-debian12 (WORKSPACE go_image_base, and its newest latest-amd64 too) carries libssl3
+3.0.20-1~deb12u2: CVE-2026-75803 (critical), CVE-2026-63072, CVE-2026-63076, CVE-2026-54874 (high; fixed in
+3.0.22-1~deb12u1) and CVE-2026-84782 (high; fixed in 3.0.22-1~deb12u2). //distroless-overrides:libssl3_x86_64 is the
+.deb from a fixed snapshot.debian.org URL (sha256 cb4784740daa9b3b0eaea2b444bbefa686794afbbf3d678d238c1fd9875f2efd), laid out the way distroless builds its own
+layers: data.tar plus var/lib/dpkg/status.d/libssl3 (+ .md5sums), so every scanner reads the installed version.
+Remove when gcr.io/distroless/base-debian12 ships libssl3 >= 3.0.22-1~deb12u2 (then bump go_image_base instead,
+hack/bump-distroless.sh).
+
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -208,7 +208,14 @@
+         "@io_bazel_rules_go//go/platform:linux_s390x": "@go_image_base_s390x",
+         "//conditions:default": "@go_image_base",
+     }),
+-    tars = [":passwd-tar"],
++    tars = select({
++        "@io_bazel_rules_go//go/platform:linux_arm64": [":passwd-tar"],
++        "@io_bazel_rules_go//go/platform:linux_s390x": [":passwd-tar"],
++        "//conditions:default": [
++            "//distroless-overrides:libssl3_x86_64",
++            ":passwd-tar",
++        ],
++    }),
+     user = "1001",
+     visibility = ["//visibility:public"],
+ )
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -359,6 +359,16 @@
+     importpath = "github.com/google/go-containerregistry",
+ )
+ 
++# ReadyStack: libssl3 from bookworm-security, layered over go_image_base (//distroless-overrides). Remove when
++# gcr.io/distroless/base-debian12 ships libssl3 >= 3.0.22-1~deb12u2.
++http_file(
++    name = "debian_bookworm_security_libssl3_amd64",
++    sha256 = "cb4784740daa9b3b0eaea2b444bbefa686794afbbf3d678d238c1fd9875f2efd",
++    urls = [
++        "https://snapshot.debian.org/archive/debian-security/20261026T040329Z/pool/updates/main/o/openssl/libssl3_3.0.22-1~deb12u2_amd64.deb",
++    ],
++)
++
+ # Pull go_image_base
+ oci_pull(
+     name = "go_image_base",
+--- a/cmd/virt-handler/BUILD.bazel
++++ b/cmd/virt-handler/BUILD.bazel
+@@ -184,6 +184,7 @@
+             ":passt_repair_tar_s390x",
+         ],
+         "//conditions:default": [
++            "//distroless-overrides:libssl3_x86_64",
+             "//rpm:handlerbase_x86_64",
+             "//rpm/rpmdb:handler_x86_64_cs9",
+             ":passwd-tar",
+--- a/cmd/virt-launcher/BUILD.bazel
++++ b/cmd/virt-launcher/BUILD.bazel
+@@ -239,6 +239,7 @@
+             ":var-run-symlink-tar",
+         ],
+         "//conditions:default": [
++            "//distroless-overrides:libssl3_x86_64",
+             "//rpm:launcherbase_x86_64",
+             "//rpm/rpmdb:launcher_x86_64_cs9",
+             ":get-version-tar",
+--- /dev/null
++++ b/distroless-overrides/BUILD.bazel
+@@ -0,0 +1,17 @@
++# ReadyStack: Debian packages that replace a vulnerable package of the distroless base (gcr.io/distroless/base-debian12,
++# WORKSPACE go_image_base) in every KubeVirt image, because the newest distroless image still carries the old one.
++#
++# libssl3 3.0.22-1~deb12u2 (bookworm-security) replaces 3.0.20-1~deb12u2: CVE-2026-75803 (critical), CVE-2026-63072,
++# CVE-2026-63076, CVE-2026-54874 (high, fixed in 3.0.22-1~deb12u1) and CVE-2026-84782 (high, fixed in 3.0.22-1~deb12u2).
++# The layer also rewrites var/lib/dpkg/status.d/libssl3, so scanners see the version installed.
++# Remove when gcr.io/distroless/base-debian12 ships libssl3 >= 3.0.22-1~deb12u2 (then bump go_image_base instead,
++# hack/bump-distroless.sh).
++
++genrule(
++    name = "libssl3_x86_64",
++    srcs = ["@debian_bookworm_security_libssl3_amd64//file"],
++    outs = ["libssl3_x86_64.tar"],
++    cmd = "python3 $(location deb2layer.py) $(location @debian_bookworm_security_libssl3_amd64//file) $@ libssl3 1791523273",
++    tools = ["deb2layer.py"],
++    visibility = ["//visibility:public"],
++)
+--- /dev/null
++++ b/distroless-overrides/deb2layer.py
+@@ -0,0 +1,47 @@
++#!/usr/bin/env python3
++"""ReadyStack: turn one Debian package into an image layer the way distroless builds its own base layers: the
++package's data.tar as files, plus var/lib/dpkg/status.d/<pkg> (its control paragraph) and <pkg>.md5sums, so every
++scanner reads the version that is actually installed. Deterministic: members sorted, owner 0:0, mtimes clamped to
++SOURCE_DATE_EPOCH. Usage: deb2layer.py <in.deb> <out.tar> <package> <source_date_epoch>"""
++import io
++import sys
++import tarfile
++
++deb, out, pkg, sde = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
++raw = open(deb, "rb").read()
++assert raw[:8] == b"!<arch>\n", "not an ar archive"
++members, off = {}, 8
++while off < len(raw):
++    hdr = raw[off:off + 60]
++    name, size = hdr[:16].decode().strip().rstrip("/"), int(hdr[48:58].decode().strip())
++    members[name] = raw[off + 60:off + 60 + size]
++    off += 60 + size + (size % 2)
++ctl = tarfile.open(fileobj=io.BytesIO(members["control.tar.xz"]), mode="r:xz")
++control = ctl.extractfile("./control").read()
++md5sums = ctl.extractfile("./md5sums").read()
++data = tarfile.open(fileobj=io.BytesIO(members["data.tar.xz"]), mode="r:xz")
++entries = {}
++for m in data.getmembers():
++    n = m.name[2:] if m.name.startswith("./") else m.name
++    if not n or n == ".":
++        continue
++    entries[n.rstrip("/")] = (m, data.extractfile(m).read() if m.isfile() else None)
++for d in ("var", "var/lib", "var/lib/dpkg", "var/lib/dpkg/status.d"):
++    t = tarfile.TarInfo(d); t.type = tarfile.DIRTYPE; t.mode = 0o755; t.mtime = sde
++    entries.setdefault(d, (t, None))
++for n, body in ((f"var/lib/dpkg/status.d/{pkg}", control), (f"var/lib/dpkg/status.d/{pkg}.md5sums", md5sums)):
++    t = tarfile.TarInfo(n); t.mode = 0o644; t.mtime = sde; t.size = len(body)
++    entries[n] = (t, body)
++with tarfile.open(out, "w", format=tarfile.GNU_FORMAT) as o:
++    for n in sorted(entries):
++        m, body = entries[n]
++        t = tarfile.TarInfo(n)
++        t.type, t.mode, t.linkname = m.type, m.mode, m.linkname
++        t.uid = t.gid = 0
++        t.uname = t.gname = ""
++        t.mtime = min(int(m.mtime), sde)
++        if body is not None:
++            t.size = len(body)
++            o.addfile(t, io.BytesIO(body))
++        else:
++            o.addfile(t)

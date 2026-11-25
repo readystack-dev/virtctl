@@ -1,0 +1,10 @@
+image_manifest_digest=sha256:a927e490ae9fb76f338ab6ba3aa61e653a37084b4a2eb7076bac76751bdd302a
+config_digest=sha256:1ae510e7c3b71f6ef72fab3bbb879b457def5894b3542158e17fc174f9209fdc
+tag=readystack/virtctl:v1.9.1-CE-scratch-r2
+probe_port=80
+probe_path=/
+probe_timeout=180
+verify_boot=oneshot
+verify_oneshot_arg=version
+verify_oneshot_arg=--client
+verify_oneshot_expect=v1.9.1

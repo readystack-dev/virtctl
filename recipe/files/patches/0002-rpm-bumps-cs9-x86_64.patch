@@ -1,0 +1,633 @@
+ReadyStack 0002: RPM bumps in KubeVirt's own lock (x86_64, CentOS Stream 9 trees only).
+
+Each bump replaces one WORKSPACE rpm() rule (name, sha256, URL) and every rpmtree label naming it in rpm/BUILD.bazel,
+the way bazeldnf writes them. The libvirt-libs_x86_64_cs9 tar2files list then names libcrypto.so.3.5.9 and
+libssl.so.3.5.9, exactly what KubeVirt's own `bazel run //rpm:ldd_x86_64_cs9` regenerates (verified). rpm --test on
+every x86_64 cs9 tree resolves the same dependencies before and after. Bumps (from rpm-bumps.tsv):
+  openssl-1__3.5.8-1.el9.x86_64 -> openssl-1__3.5.9-1.el9.x86_64  (CVE-2026-84782 high (RHEL 1:3.5.8-2.el9_8), CVE-2026-14456 high (RHEL 1:3.5.8-1.el9_8); CS9 rebased to 3.5.9)
+  openssl-libs-1__3.5.8-1.el9.x86_64 -> openssl-libs-1__3.5.9-1.el9.x86_64  (same source as openssl)
+  openssl-fips-provider-1__3.5.8-1.el9.x86_64 -> openssl-fips-provider-1__3.5.9-1.el9.x86_64  (same source as openssl)
+  pcre2-0__10.40-6.el9.x86_64 -> pcre2-0__10.40-7.el9.x86_64  (CVE-2026-86145, CVE-2026-89161 high (changelog 10.40-7: Backport multiple CVE fixes))
+  pcre2-syntax-0__10.40-6.el9.x86_64 -> pcre2-syntax-0__10.40-7.el9.x86_64  (same source as pcre2)
+  ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64 -> ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64  (CVE-2026-114406 critical (RHEL 2026.2.92_v9.0.319-90.3.el9_8))
+  libevent-0__2.1.12-8.el9.x86_64 -> libevent-0__2.1.13-1.el9.x86_64  (CVE-2026-63382/63383/63384/63385/63387/63388 high (changelog 2.1.13-1))
+  libpcap-14__1.10.0-4.el9.x86_64 -> libpcap-14__1.10.0-5.el9.x86_64  (CVE-2026-0799 high (changelog 14:1.10.0-5))
+  xz-0__5.2.5-8.el9.x86_64 -> xz-0__5.2.5-10.el9.x86_64  (Scout flags CVE-2022-1271 high on 5.2.5-8.el9 (el9 vs RHEL el9_0; 5.2.5-8 already resolves it); -10 sorts above)
+  xz-libs-0__5.2.5-8.el9.x86_64 -> xz-libs-0__5.2.5-10.el9.x86_64  (same source as xz)
+
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -1199,10 +1199,10 @@
+ )
+ 
+ rpm(
+-    name = "ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64",
+-    sha256 = "bc306dcea17c26ec30a97cdd094d2a74646de77ea5150192bbae33dc1e8daf30",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/ca-certificates-2026.2.90_v9.0.316-90.0.el9.noarch.rpm",
++    name = "ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64",
++    sha256 = "894b4f3b5502310f7fe0d73e708956e4ed6c8998cb8f482c14d214fb3059de96",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/ca-certificates-2026.2.92_v9.0.319-91.3.el9.noarch.rpm",
+     ],
+ )
+ 
+@@ -6310,11 +6310,10 @@
+ )
+ 
+ rpm(
+-    name = "libevent-0__2.1.12-8.el9.x86_64",
+-    sha256 = "5683f51c9b02d5f4a3324dc6dacb3a84f0c3710cdc46fa7f04df64b60d38a62b",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libevent-2.1.12-8.el9.x86_64.rpm",
+-        "https://storage.googleapis.com/builddeps/5683f51c9b02d5f4a3324dc6dacb3a84f0c3710cdc46fa7f04df64b60d38a62b",
++    name = "libevent-0__2.1.13-1.el9.x86_64",
++    sha256 = "800aa5a3daffc25ecda732c3d2b4fe87105a03288b4425695def4bda18d7aae3",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libevent-2.1.13-1.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -7645,11 +7644,10 @@
+ )
+ 
+ rpm(
+-    name = "libpcap-14__1.10.0-4.el9.x86_64",
+-    sha256 = "c76c9887f6b9d218300b24f1adee1b0d9104d25152df3fcd005002d12e12399e",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libpcap-1.10.0-4.el9.x86_64.rpm",
+-        "https://storage.googleapis.com/builddeps/c76c9887f6b9d218300b24f1adee1b0d9104d25152df3fcd005002d12e12399e",
++    name = "libpcap-14__1.10.0-5.el9.x86_64",
++    sha256 = "abc8c3dac7b2f8b4f7a33887c2141cf813376f8577bf78ea08084c1069515379",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libpcap-1.10.0-5.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -10900,10 +10898,10 @@
+ )
+ 
+ rpm(
+-    name = "openssl-1__3.5.8-1.el9.x86_64",
+-    sha256 = "b97860c63a00ab5a00a3bb1ffa0fc2657e7da128e1adbb7a0a6b90c30ae8204e",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-3.5.8-1.el9.x86_64.rpm",
++    name = "openssl-1__3.5.9-1.el9.x86_64",
++    sha256 = "2c5a020994883bc37877ad75a9355f41716f0374e871f3a9bba3e85781daa8d3",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-3.5.9-1.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -10951,10 +10949,10 @@
+ )
+ 
+ rpm(
+-    name = "openssl-fips-provider-1__3.5.8-1.el9.x86_64",
+-    sha256 = "a85d39899c41ea7cc151a8c3600f2f452a7b4d4942b3e2911bdbb843ca2c37d8",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-fips-provider-3.5.8-1.el9.x86_64.rpm",
++    name = "openssl-fips-provider-1__3.5.9-1.el9.x86_64",
++    sha256 = "1c5a1a397f9242f94e83af39a5b79972d4716b7db5bb22f7c5410738e4b26454",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-fips-provider-3.5.9-1.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -11008,10 +11006,10 @@
+ )
+ 
+ rpm(
+-    name = "openssl-libs-1__3.5.8-1.el9.x86_64",
+-    sha256 = "35e05f6572e8fa953564ccf58e2c1198ef20778bd828b724bdb3a6226fb9d031",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-libs-3.5.8-1.el9.x86_64.rpm",
++    name = "openssl-libs-1__3.5.9-1.el9.x86_64",
++    sha256 = "d2577e458c871a1262ac8d3840b1deee88bf8efc57e81ea2fa4d6ddbd117d6b4",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-libs-3.5.9-1.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -11437,11 +11435,10 @@
+ )
+ 
+ rpm(
+-    name = "pcre2-0__10.40-6.el9.x86_64",
+-    sha256 = "bc1012f5417aab8393836d78ac8c5472b1a2d84a2f9fa2b00fff5f8ad3a5ec26",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pcre2-10.40-6.el9.x86_64.rpm",
+-        "https://storage.googleapis.com/builddeps/bc1012f5417aab8393836d78ac8c5472b1a2d84a2f9fa2b00fff5f8ad3a5ec26",
++    name = "pcre2-0__10.40-7.el9.x86_64",
++    sha256 = "04792d0a1254310e4848240c8f604a35e6b576594986934455275f4148323fb3",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pcre2-10.40-7.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -11491,11 +11488,10 @@
+ )
+ 
+ rpm(
+-    name = "pcre2-syntax-0__10.40-6.el9.x86_64",
+-    sha256 = "be36a84f6e311a59190664d61a466471391ab01fb77bd1d2348e9a76414aded4",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pcre2-syntax-10.40-6.el9.noarch.rpm",
+-        "https://storage.googleapis.com/builddeps/be36a84f6e311a59190664d61a466471391ab01fb77bd1d2348e9a76414aded4",
++    name = "pcre2-syntax-0__10.40-7.el9.x86_64",
++    sha256 = "737b26a6aa9b4b7e5d77608c90aa437d777b114c5b569e475710a34c416cafd5",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pcre2-syntax-10.40-7.el9.noarch.rpm",
+     ],
+ )
+ 
+@@ -15374,11 +15370,10 @@
+ )
+ 
+ rpm(
+-    name = "xz-0__5.2.5-8.el9.x86_64",
+-    sha256 = "159f0d11b5a78efa493b478b0c2df7ef42a54a9710b32dba9f94dd73eb333481",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/xz-5.2.5-8.el9.x86_64.rpm",
+-        "https://storage.googleapis.com/builddeps/159f0d11b5a78efa493b478b0c2df7ef42a54a9710b32dba9f94dd73eb333481",
++    name = "xz-0__5.2.5-10.el9.x86_64",
++    sha256 = "5fa1fb9361036442b0cde240f9d7b2fd3aa8dd1d12645ad4cd03740557bb9455",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/xz-5.2.5-10.el9.x86_64.rpm",
+     ],
+ )
+ 
+@@ -15428,11 +15423,10 @@
+ )
+ 
+ rpm(
+-    name = "xz-libs-0__5.2.5-8.el9.x86_64",
+-    sha256 = "ff3c88297d75c51a5f8e9d2d69f8ad1eaf8347e20920b4335a3e0fc53269ad28",
+-    urls = [
+-        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/xz-libs-5.2.5-8.el9.x86_64.rpm",
+-        "https://storage.googleapis.com/builddeps/ff3c88297d75c51a5f8e9d2d69f8ad1eaf8347e20920b4335a3e0fc53269ad28",
++    name = "xz-libs-0__5.2.5-10.el9.x86_64",
++    sha256 = "50abdfa9d23ad825d1956a5ecf08d2950d6a0189771f2d5601ba11a61caaa1f8",
++    urls = [
++        "http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/xz-libs-5.2.5-10.el9.x86_64.rpm",
+     ],
+ )
+ 
+--- a/rpm/BUILD.bazel
++++ b/rpm/BUILD.bazel
+@@ -828,7 +828,7 @@
+         "@alternatives-0__1.24-2.el9.x86_64//rpm",
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -861,13 +861,13 @@
+         "@mpfr-0__4.1.0-10.el9.x86_64//rpm",
+         "@ncurses-base-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@readline-0__8.1-4.el9.x86_64//rpm",
+         "@sed-0__4.8-10.el9.x86_64//rpm",
+         "@setup-0__2.13.7-10.el9.x86_64//rpm",
+@@ -1483,7 +1483,7 @@
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -1561,15 +1561,15 @@
+         "@nettle-0__3.10.1-1.el9.x86_64//rpm",
+         "@nftables-1__1.0.9-9.el9.x86_64//rpm",
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@policycoreutils-0__3.6-9.el9.x86_64//rpm",
+         "@popt-0__1.18-8.el9.x86_64//rpm",
+         "@procps-ng-0__3.3.17-15.el9.x86_64//rpm",
+@@ -1592,7 +1592,7 @@
+         "@util-linux-core-0__2.37.4-27.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+         "@xorriso-0__1.5.4-5.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     symlinks = {
+@@ -2591,7 +2591,7 @@
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-0__1.0.8-11.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@capstone-0__4.0.2-12.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+@@ -2652,7 +2652,7 @@
+         "@libcurl-minimal-0__7.76.1-43.el9.x86_64//rpm",
+         "@libdb-0__5.3.28-57.el9.x86_64//rpm",
+         "@libeconf-0__0.4.1-7.el9.x86_64//rpm",
+-        "@libevent-0__2.1.12-8.el9.x86_64//rpm",
++        "@libevent-0__2.1.13-1.el9.x86_64//rpm",
+         "@libfdisk-0__2.37.4-27.el9.x86_64//rpm",
+         "@libfdt-0__1.6.0-7.el9.x86_64//rpm",
+         "@libffi-0__3.4.2-8.el9.x86_64//rpm",
+@@ -2672,7 +2672,7 @@
+         "@libnftnl-0__1.2.6-4.el9.x86_64//rpm",
+         "@libnghttp2-0__1.43.0-8.el9.x86_64//rpm",
+         "@libnl3-0__3.11.0-1.el9.x86_64//rpm",
+-        "@libpcap-14__1.10.0-4.el9.x86_64//rpm",
++        "@libpcap-14__1.10.0-5.el9.x86_64//rpm",
+         "@libpmem-0__1.12.1-1.el9.x86_64//rpm",
+         "@libpng-2__1.6.37-17.el9.x86_64//rpm",
+         "@libpwquality-0__1.4.4-8.el9.x86_64//rpm",
+@@ -2718,16 +2718,16 @@
+         "@nmap-ncat-3__7.92-5.el9.x86_64//rpm",
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+         "@numad-0__0.5-50.20251104git.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@passt-0__0__caret__20260611.ga9c61ff-1.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pixman-0__0.40.0-6.el9.x86_64//rpm",
+         "@policycoreutils-0__3.6-9.el9.x86_64//rpm",
+         "@polkit-0__0.117-16.el9.x86_64//rpm",
+@@ -2775,8 +2775,8 @@
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+         "@virtiofsd-0__1.13.0-1.el9.x86_64//rpm",
+         "@xorriso-0__1.5.4-5.el9.x86_64//rpm",
+-        "@xz-0__5.2.5-8.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-0__5.2.5-10.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+         "@zstd-0__1.5.5-1.el9.x86_64//rpm",
+     ],
+@@ -2871,7 +2871,7 @@
+         "@libcurl-minimal-0__7.76.1-31.el9.x86_64//rpm",
+         "@libdb-0__5.3.28-55.el9.x86_64//rpm",
+         "@libeconf-0__0.4.1-4.el9.x86_64//rpm",
+-        "@libevent-0__2.1.12-8.el9.x86_64//rpm",
++        "@libevent-0__2.1.13-1.el9.x86_64//rpm",
+         "@libfdisk-0__2.37.4-21.el9.x86_64//rpm",
+         "@libfdt-0__1.6.0-7.el9.x86_64//rpm",
+         "@libffi-0__3.4.2-8.el9.x86_64//rpm",
+@@ -2950,8 +2950,8 @@
+         "@pam-0__1.5.1-23.el9.x86_64//rpm",
+         "@parted-0__3.5-3.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pixman-0__0.40.0-6.el9.x86_64//rpm",
+         "@policycoreutils-0__3.6-2.1.el9.x86_64//rpm",
+         "@polkit-0__0.117-13.el9.x86_64//rpm",
+@@ -2988,8 +2988,8 @@
+         "@util-linux-core-0__2.37.4-21.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-21.el9.x86_64//rpm",
+         "@which-0__2.21-29.el9.x86_64//rpm",
+-        "@xz-0__5.2.5-8.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-0__5.2.5-10.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+         "@zstd-0__1.5.5-1.el9.x86_64//rpm",
+     ],
+@@ -3611,7 +3611,7 @@
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-0__1.0.8-11.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@capstone-0__4.0.2-12.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+@@ -3682,7 +3682,7 @@
+         "@libcurl-minimal-0__7.76.1-43.el9.x86_64//rpm",
+         "@libdb-0__5.3.28-57.el9.x86_64//rpm",
+         "@libeconf-0__0.4.1-7.el9.x86_64//rpm",
+-        "@libevent-0__2.1.12-8.el9.x86_64//rpm",
++        "@libevent-0__2.1.13-1.el9.x86_64//rpm",
+         "@libfdisk-0__2.37.4-27.el9.x86_64//rpm",
+         "@libfdt-0__1.6.0-7.el9.x86_64//rpm",
+         "@libffi-0__3.4.2-8.el9.x86_64//rpm",
+@@ -3752,9 +3752,9 @@
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+         "@numad-0__0.5-50.20251104git.el9.x86_64//rpm",
+         "@openldap-0__2.6.13-1.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@osinfo-db-0__20260812-1.el9.x86_64//rpm",
+         "@osinfo-db-tools-0__1.10.0-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+@@ -3762,8 +3762,8 @@
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@parted-0__3.5-3.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pixman-0__0.40.0-6.el9.x86_64//rpm",
+         "@policycoreutils-0__3.6-9.el9.x86_64//rpm",
+         "@polkit-0__0.117-16.el9.x86_64//rpm",
+@@ -3800,8 +3800,8 @@
+         "@util-linux-core-0__2.37.4-27.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+         "@which-0__2.21-30.el9.x86_64//rpm",
+-        "@xz-0__5.2.5-8.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-0__5.2.5-10.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+         "@zstd-0__1.5.5-1.el9.x86_64//rpm",
+     ],
+@@ -4163,7 +4163,7 @@
+         "@alternatives-0__1.24-2.el9.x86_64//rpm",
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -4205,12 +4205,12 @@
+         "@ncurses-base-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@nettle-0__3.10.1-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pkgconf-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-m4-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-pkg-config-0__1.7.3-10.el9.x86_64//rpm",
+@@ -4219,7 +4219,7 @@
+         "@setup-0__2.13.7-10.el9.x86_64//rpm",
+         "@tzdata-0__2026c-1.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     visibility = ["//visibility:public"],
+@@ -4673,7 +4673,7 @@
+         "@audit-libs-0__3.1.5-9.el9.x86_64//rpm",
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -4731,12 +4731,12 @@
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@nettle-0__3.10.1-1.el9.x86_64//rpm",
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pkgconf-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-m4-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-pkg-config-0__1.7.3-10.el9.x86_64//rpm",
+@@ -4745,7 +4745,7 @@
+         "@setup-0__2.13.7-10.el9.x86_64//rpm",
+         "@tzdata-0__2026c-1.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     visibility = ["//visibility:public"],
+@@ -5174,7 +5174,7 @@
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -5243,15 +5243,15 @@
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@nettle-0__3.10.1-1.el9.x86_64//rpm",
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@qemu-pr-helper-17__10.1.0-24.el9.x86_64//rpm",
+         "@readline-0__8.1-4.el9.x86_64//rpm",
+         "@sed-0__4.8-10.el9.x86_64//rpm",
+@@ -5266,7 +5266,7 @@
+         "@util-linux-0__2.37.4-27.el9.x86_64//rpm",
+         "@util-linux-core-0__2.37.4-27.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     visibility = ["//visibility:public"],
+@@ -5816,7 +5816,7 @@
+         "@binutils-0__2.35.2-72.el9.x86_64//rpm",
+         "@binutils-gold-0__2.35.2-72.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -5882,14 +5882,14 @@
+         "@mpfr-0__4.1.0-10.el9.x86_64//rpm",
+         "@ncurses-base-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@pkgconf-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-m4-0__1.7.3-10.el9.x86_64//rpm",
+         "@pkgconf-pkg-config-0__1.7.3-10.el9.x86_64//rpm",
+@@ -5904,7 +5904,7 @@
+         "@sssd-client-0__2.9.9-3.el9.x86_64//rpm",
+         "@tzdata-0__2026c-1.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     symlinks = {
+@@ -6279,7 +6279,7 @@
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -6316,13 +6316,13 @@
+         "@mpfr-0__4.1.0-10.el9.x86_64//rpm",
+         "@ncurses-base-0__6.2-12.20210508.el9.x86_64//rpm",
+         "@ncurses-libs-0__6.2-12.20210508.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@python3-0__3.9.25-10.el9.x86_64//rpm",
+         "@python3-libs-0__3.9.25-10.el9.x86_64//rpm",
+         "@python3-pip-wheel-0__21.3.1-2.el9.x86_64//rpm",
+@@ -6333,7 +6333,7 @@
+         "@sqlite-libs-0__3.34.1-11.el9.x86_64//rpm",
+         "@tzdata-0__2026c-1.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     visibility = ["//visibility:public"],
+@@ -7045,7 +7045,7 @@
+         "@basesystem-0__11-13.el9.x86_64//rpm",
+         "@bash-0__5.1.8-9.el9.x86_64//rpm",
+         "@bzip2-libs-0__1.0.8-11.el9.x86_64//rpm",
+-        "@ca-certificates-0__2026.2.90_v9.0.316-90.0.el9.x86_64//rpm",
++        "@ca-certificates-0__2026.2.92_v9.0.319-91.3.el9.x86_64//rpm",
+         "@centos-gpg-keys-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-release-0__9.0-38.el9.x86_64//rpm",
+         "@centos-stream-repos-0__9.0-38.el9.x86_64//rpm",
+@@ -7101,7 +7101,7 @@
+         "@libmount-0__2.37.4-27.el9.x86_64//rpm",
+         "@libnghttp2-0__1.43.0-8.el9.x86_64//rpm",
+         "@libnl3-0__3.11.0-1.el9.x86_64//rpm",
+-        "@libpcap-14__1.10.0-4.el9.x86_64//rpm",
++        "@libpcap-14__1.10.0-5.el9.x86_64//rpm",
+         "@libpwquality-0__1.4.4-8.el9.x86_64//rpm",
+         "@libseccomp-0__2.5.6-1.el9.x86_64//rpm",
+         "@libselinux-0__3.6-4.el9.x86_64//rpm",
+@@ -7125,15 +7125,15 @@
+         "@nettle-0__3.10.1-1.el9.x86_64//rpm",
+         "@nmap-ncat-3__7.92-5.el9.x86_64//rpm",
+         "@numactl-libs-0__2.0.19-3.el9.x86_64//rpm",
+-        "@openssl-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-fips-provider-1__3.5.8-1.el9.x86_64//rpm",
+-        "@openssl-libs-1__3.5.8-1.el9.x86_64//rpm",
++        "@openssl-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-fips-provider-1__3.5.9-1.el9.x86_64//rpm",
++        "@openssl-libs-1__3.5.9-1.el9.x86_64//rpm",
+         "@p11-kit-0__0.26.4-1.el9.x86_64//rpm",
+         "@p11-kit-trust-0__0.26.4-1.el9.x86_64//rpm",
+         "@pam-0__1.5.1-30.el9.x86_64//rpm",
+         "@pcre-0__8.44-4.el9.x86_64//rpm",
+-        "@pcre2-0__10.40-6.el9.x86_64//rpm",
+-        "@pcre2-syntax-0__10.40-6.el9.x86_64//rpm",
++        "@pcre2-0__10.40-7.el9.x86_64//rpm",
++        "@pcre2-syntax-0__10.40-7.el9.x86_64//rpm",
+         "@procps-ng-0__3.3.17-15.el9.x86_64//rpm",
+         "@python3-0__3.9.25-10.el9.x86_64//rpm",
+         "@python3-configshell-1__1.1.30-1.el9.x86_64//rpm",
+@@ -7168,7 +7168,7 @@
+         "@util-linux-core-0__2.37.4-27.el9.x86_64//rpm",
+         "@vim-minimal-2__8.2.2637-40.el9.x86_64//rpm",
+         "@which-0__2.21-30.el9.x86_64//rpm",
+-        "@xz-libs-0__5.2.5-8.el9.x86_64//rpm",
++        "@xz-libs-0__5.2.5-10.el9.x86_64//rpm",
+         "@zlib-0__1.2.11-41.el9.x86_64//rpm",
+     ],
+     symlinks = {
+@@ -8077,7 +8077,7 @@
+             "libcrypt.so.2",
+             "libcrypt.so.2.0.0",
+             "libcrypto.so.3",
+-            "libcrypto.so.3.5.8",
++            "libcrypto.so.3.5.9",
+             "libcurl.so.4",
+             "libcurl.so.4.7.0",
+             "libffi.so.8",
+@@ -8138,7 +8138,7 @@
+             "libssh.so.4",
+             "libssh.so.4.9.4",
+             "libssl.so.3",
+-            "libssl.so.3.5.8",
++            "libssl.so.3.5.9",
+             "libtasn1.so.6",
+             "libtasn1.so.6.6.0",
+             "libtirpc.so.3",

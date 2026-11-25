@@ -1,0 +1,390 @@
+{
+ "schema": "readystack.recipe.v1",
+ "slug": "virtctl",
+ "tag": "v1.9.1-CE-scratch-r2",
+ "tarball": "ReadyStack-virtctl-v1.9.1-CE-scratch-r2.tar.gz",
+ "tarball_sha256": "4b03455194985da190c240a791f756ea7e6c1ccb2333ef0788a51fa3dcfd75d1",
+ "kit_root": "v1.9.1-CE-scratch-r2",
+ "generated_at": "2026-11-12T05:26:23Z",
+ "generator": "KitForge release/recipe_publish.py",
+ "dockerfile": "Dockerfile.offline.pinned",
+ "build_script": "BUILD_OFFLINE.sh",
+ "preview_lines": 24,
+ "pins": {
+  "upstream": {
+   "repo": "https://github.com/kubevirt/kubevirt",
+   "ref": "v1.9.1",
+   "commit": "c3d19093f9c7b843b3879b18dc088911c081c39e",
+   "url": "https://github.com/kubevirt/kubevirt/tree/c3d19093f9c7b843b3879b18dc088911c081c39e",
+   "from": "docs/provenance/BUILD_RECIPE.json"
+  },
+  "fetches": [
+   {
+    "kind": "git",
+    "url": "https://github.com/kubevirt/kubevirt.git"
+   }
+  ],
+  "bases": [
+   {
+    "ref": "quay.io/kubevirt/builder:2606231619-4fe2cd536f@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8",
+    "image": "quay.io/kubevirt/builder:2606231619-4fe2cd536f",
+    "digest": "sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8"
+   }
+  ],
+  "toolchain": {
+   "buildkit": "moby/buildkit:v0.31.2",
+   "buildkit_image_digest": "sha256:e0e67ea9c4bb07bdef683e29f70f3b623d1eb9c82274a9ec04e6bb0511449fb0",
+   "builder_images": [
+    "quay.io/kubevirt/builder:2606231619-4fe2cd536f@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8"
+   ]
+  },
+  "build_method": "source-rebuild-go",
+  "source_date_epoch": 1791523273,
+  "source_date_epoch_utc": "2026-10-09T05:21:13Z",
+  "target": {
+   "image_manifest_digest": "sha256:a927e490ae9fb76f338ab6ba3aa61e653a37084b4a2eb7076bac76751bdd302a",
+   "config_digest": "sha256:1ae510e7c3b71f6ef72fab3bbb879b457def5894b3542158e17fc174f9209fdc",
+   "image": "readystack/virtctl:v1.9.1-CE-scratch-r2"
+  },
+  "checksummed_files": 25670
+ },
+ "files": [
+  {
+   "path": "BASES.tsv",
+   "size": 189,
+   "sha256": "5a810af4e9abf4e10d821842707a424825d58eff1e69e2c84d4f7aa40b772f7a",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "BUILD_OFFLINE.sh",
+   "size": 8856,
+   "sha256": "6ab4f08a6ec775b32d854f03413b30ecfe555ddba78cf0de956235f5a2a39542",
+   "lines": 162,
+   "public": "preview",
+   "preview_lines": 24
+  },
+  {
+   "path": "CHECKSUMS.sha256",
+   "size": 3871870,
+   "sha256": "b815d76bce72bef682ae5b93a1caaaf32c9d292d4840d01c503930fda5532e25",
+   "lines": 25670,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "DOCKERFILE_NAME.txt",
+   "size": 26,
+   "sha256": "9aadd1ede68e016a6f163c97befc5ff2fcdc8ebd4f84b108dba63cb195fa8c84",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "Dockerfile",
+   "size": 3062,
+   "sha256": "1f5ee0e8ef3d8eb27b5000fb14a0f31b4f73fcfc125801ff44fab0e2df151477",
+   "lines": 39,
+   "public": "account"
+  },
+  {
+   "path": "Dockerfile.offline",
+   "size": 3062,
+   "sha256": "1f5ee0e8ef3d8eb27b5000fb14a0f31b4f73fcfc125801ff44fab0e2df151477",
+   "lines": 39,
+   "public": "account"
+  },
+  {
+   "path": "Dockerfile.offline.pinned",
+   "size": 3062,
+   "sha256": "1f5ee0e8ef3d8eb27b5000fb14a0f31b4f73fcfc125801ff44fab0e2df151477",
+   "lines": 39,
+   "public": "preview",
+   "preview_lines": 24
+  },
+  {
+   "path": "Dockerfile.vendor",
+   "size": 2191,
+   "sha256": "28056dcd352185c38970c2659b456ca09ee91ef66ef7bb07cc6bc73cb134264a",
+   "lines": 28,
+   "public": "account"
+  },
+  {
+   "path": "FILE_MODES.tsv",
+   "size": 2569637,
+   "sha256": "9392b337062248b1b2cb6e47990be4a093b38d9f352c915a51c676e681aa4d20",
+   "lines": 30364,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "MANIFEST.txt",
+   "size": 2126340,
+   "sha256": "c31d19fe9fd35bbae23ef4273afcd3124dc89e4c7c7f5dbaec50c42fa229d566",
+   "lines": 25672,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "README.md",
+   "size": 3258,
+   "sha256": "2b3e1f60229f51f17c7210cbcadffc37ac95ec0db4fea48ff7bf311bb88f0561",
+   "lines": 39,
+   "public": "account"
+  },
+  {
+   "path": "SOURCE_DATE_EPOCH.txt",
+   "size": 11,
+   "sha256": "db702391979e0aeef560b35228390eff6b06039d97d03e916f6b9883bdd32df7",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "TARGET_DIGEST.txt",
+   "size": 373,
+   "sha256": "c9a37694bd9491562ec85c24cc1f5ba076474e3821d407e34fee46e32ce8c9d6",
+   "lines": 10,
+   "public": "full"
+  },
+  {
+   "path": "VERIFY_OFFLINE.sh",
+   "size": 10153,
+   "sha256": "3e8184ea230cfd8f41f977e26be6bf7bd03112c396c517837ce0c7de4f7399dd",
+   "lines": 165,
+   "public": "account"
+  },
+  {
+   "path": "docs/PROVENANCE.md",
+   "size": 2554,
+   "sha256": "ee9c5b67a20c1d6a988f8eda492023d5ffafb9f0b0b2eed9818847ba95af88e8",
+   "lines": 36,
+   "public": "account"
+  },
+  {
+   "path": "docs/REBUILD.md",
+   "size": 6287,
+   "sha256": "8b16e9d98e1c5c00edb2265eb70f38ae8d34ceb62647f6798b4040eace515178",
+   "lines": 62,
+   "public": "account"
+  },
+  {
+   "path": "docs/VERIFY.md",
+   "size": 1936,
+   "sha256": "df0e96f58793891a0b31ea575e32e45aa6241e13979478bd33fb528010f4c6ad",
+   "lines": 34,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/BASE_IMAGE_DIGESTS.lock",
+   "size": 168,
+   "sha256": "092e5e79eec6b78fdc4818d4edc9a9abca4bb1060e2347d27f681ea0aa25bf17",
+   "lines": 2,
+   "public": "full"
+  },
+  {
+   "path": "docs/provenance/BUILD_RECIPE.json",
+   "size": 2446,
+   "sha256": "93357a731e3b1216c2b9699a7e1e9d7c4d71832881459dea690234530868fa49",
+   "lines": 42,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/CUSTODY_INPUTS.json",
+   "size": 649,
+   "sha256": "a68ccf4b1a376306c7eefa01543bad40b5398e54250860a91b2f54607f2584d5",
+   "lines": 17,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/SOURCE_FILE_MANIFEST.json",
+   "size": 276315,
+   "sha256": "4c87dedf7e65dbb8c0b715bb4ee3afbcda2e0fd66da8cc32d093b4d7d188b6d1",
+   "lines": 5007,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "docs/provenance/SOURCE_TREE_HASH.json",
+   "size": 308,
+   "sha256": "b239515aad6b3926bf0a948e3c0b59829817722ba4f06cc477fd520de4b1d60d",
+   "lines": 9,
+   "public": "full"
+  },
+  {
+   "path": "docs/provenance/SYSTEM_PINNING.lock",
+   "size": 1,
+   "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+   "lines": 1,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/TOOLCHAIN.lock",
+   "size": 3019,
+   "sha256": "a421e73eec25ce669f2094bae7a6b649211713fa5bcdcf3ac2f76a4dbcb7ff08",
+   "lines": 57,
+   "public": "account"
+  },
+  {
+   "path": "gen_rpmdb.py",
+   "size": 1955,
+   "sha256": "4ccfc567d8604ba578a9001bdfb6ffce9e4f759018a487e83b82a291141b150d",
+   "lines": 34,
+   "public": "account"
+  },
+  {
+   "path": "gomod-sbom.py",
+   "size": 6827,
+   "sha256": "36dda6e3fecfe3b36290c2d590cfe0b017ed8bdc6261f7c74c14754c098cb868",
+   "lines": 122,
+   "public": "account"
+  },
+  {
+   "path": "gomod-virtctl.txt",
+   "size": 4331,
+   "sha256": "b399b99ce7b2ab5b90f6b6560a8a9a4362f7cda6a328ff2e6251e3d085aaa210",
+   "lines": 90,
+   "public": "account"
+  },
+  {
+   "path": "kubevirt-build.sh",
+   "size": 8200,
+   "sha256": "0a8b822cd8dabb2009f98e06a3a40db8f35ec1fdcda7eed1e19110c0cb0225f2",
+   "lines": 156,
+   "public": "account"
+  },
+  {
+   "path": "kubevirt-pins.env",
+   "size": 485,
+   "sha256": "17f3ad30a730a21ef24f6a92de7d96bc48330ee7386fa9c7c7ba6b58150552a7",
+   "lines": 9,
+   "public": "account"
+  },
+  {
+   "path": "oci-rootfs.py",
+   "size": 9179,
+   "sha256": "4f065252354c788d72290f873f6ef96c5a45a712883fa027aeb5a047367b99e1",
+   "lines": 199,
+   "public": "account"
+  },
+  {
+   "path": "patches/0001-go-sdk-1.26.10.patch",
+   "size": 1331,
+   "sha256": "ebbc8de594974d46e283c9c2259436825eb44692624c1d3db3f36f23686dca56",
+   "lines": 37,
+   "public": "account"
+  },
+  {
+   "path": "patches/0002-rpm-bumps-cs9-x86_64.patch",
+   "size": 30141,
+   "sha256": "6cb034453b7b829eb834c5e86d0ca129e0414c05021af640b4216f2f885420d8",
+   "lines": 633,
+   "public": "account"
+  },
+  {
+   "path": "patches/0003-rpmdb-layer.patch",
+   "size": 20458,
+   "sha256": "fbfb796cd80f0be6975414591c1228227780fd3fa107a6fce14de5581c0e1b81",
+   "lines": 416,
+   "public": "account"
+  },
+  {
+   "path": "patches/0004-virt-handler-nonroot-default-user.patch",
+   "size": 734,
+   "sha256": "860de2d46557b3a57c18e95ce4163bd616bd421bb5e9ff88b6375b41e4bc6697",
+   "lines": 16,
+   "public": "account"
+  },
+  {
+   "path": "patches/0005-distroless-libssl3-3.0.22-1-deb12u2.patch",
+   "size": 6313,
+   "sha256": "3a160db2ff4d0e3d2e744370bcee04619523b13b2cbcf7471731635538a29f09",
+   "lines": 137,
+   "public": "account"
+  },
+  {
+   "path": "patches/0006-go-modules-x-net-0.62.0-grpc-1.83.2.patch",
+   "size": 6853944,
+   "sha256": "c20d166bf6e5a691bf5002dff0273ef6f0bde1b5d81dd53567ab7a33abd53f05",
+   "lines": 138209,
+   "redactions": [
+    {
+     "line": 23,
+     "kind": "internal host"
+    },
+    {
+     "line": 136231,
+     "kind": "internal host"
+    },
+    {
+     "line": 136270,
+     "kind": "internal host"
+    },
+    {
+     "line": 136305,
+     "kind": "internal host"
+    },
+    {
+     "line": 136309,
+     "kind": "internal host"
+    },
+    {
+     "line": 136419,
+     "kind": "internal host"
+    },
+    {
+     "line": 137772,
+     "kind": "internal host"
+    },
+    {
+     "line": 137786,
+     "kind": "internal host"
+    },
+    {
+     "line": 137800,
+     "kind": "internal host"
+    },
+    {
+     "line": 137984,
+     "kind": "internal host"
+    }
+   ],
+   "kit_sha256": "7f6c25ff0dc51f9b60739ab98a820a7ae01193436b10a07b126de63cb9206b24",
+   "kit_size": 6853825,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "rebuild.json",
+   "size": 1263,
+   "sha256": "363ef5c3bf35218dd7ef654d9570b309620799091440861015326f2eabbefce4",
+   "lines": 37,
+   "public": "account"
+  },
+  {
+   "path": "toolchain/BUILDKIT_TAG.txt",
+   "size": 22,
+   "sha256": "fcd530eeb02b063d2f047adad6eef896422a8e8d558513e5f09b2a262be32573",
+   "lines": 1,
+   "public": "full"
+  }
+ ],
+ "skipped": [],
+ "kit_adds": {
+  "bases": {
+   "files": 22,
+   "bytes": 816718381
+  },
+  "docs": {
+   "files": 12775,
+   "bytes": 115017482
+  },
+  "toolchain": {
+   "files": 1,
+   "bytes": 111529472
+  },
+  "vendored": {
+   "files": 12836,
+   "bytes": 313442982
+  }
+ },
+ "redacted_files": 1
+}

@@ -1,0 +1,2 @@
+# base images for virtctl (resolve at build_kit)
+quay.io/kubevirt/builder:2606231619-4fe2cd536f@sha256:a48a7dd5a1b80602269b8c714fdaa54f729a9a4a4d096f7ee0d15c94cef343e8

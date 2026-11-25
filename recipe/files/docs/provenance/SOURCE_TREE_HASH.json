@@ -1,0 +1,9 @@
+{
+  "schema": "kitforge.source_tree_hash.v1",
+  "slug": "virtctl",
+  "repo": "https://github.com/kubevirt/kubevirt",
+  "ref": "v1.9.1",
+  "commit": "c3d19093f9c7b843b3879b18dc088911c081c39e",
+  "tree_listing_sha256": "de7abf04e51b6cf004d0365dfe6d8c5251edeeb69bfa0caa3d8b366b85fe6f36",
+  "file_count": 12717
+}

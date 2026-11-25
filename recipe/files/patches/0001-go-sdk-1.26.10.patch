@@ -1,0 +1,37 @@
+ReadyStack 0001: pin the Go SDK by file and sha256, go1.26.10 linux-amd64.
+
+rules_go resolves go_register_toolchains(version=...) by reading https://go.dev/dl/?mode=json at fetch time; that
+download has no sha256, so it cannot come from a repository cache and an offline build fails. go_download_sdk with
+sdks= names the archive and its sha256 instead. 1.26.10 is the stack's one Go toolchain (registry/stacks/kubevirt-stack.json
+compat.go); it clears the 3 critical + 15 high Go stdlib findings of KubeVirt's own 1.26.4 (fixed in 1.26.5-1.26.9).
+
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -242,6 +242,7 @@
+ )
+ load(
+     "@io_bazel_rules_go//go:deps.bzl",
++    "go_download_sdk",
+     "go_register_toolchains",
+     "go_rules_dependencies",
+ )
+@@ -254,9 +255,18 @@
+ 
+ go_rules_dependencies()
+ 
++# ReadyStack: the Go SDK pinned by file and sha256 (rules_go otherwise reads go.dev/dl at fetch time, which an
++# offline build cannot), linux_amd64 only.
++go_download_sdk(
++    name = "go_sdk",
++    sdks = {
++        "linux_amd64": ("go1.26.10.linux-amd64.tar.gz", "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5"),
++    },
++    version = "1.26.10",
++)
++
+ go_register_toolchains(
+     nogo = "@//:nogo_vet",
+-    version = "1.26.4",
+ )
+ 
+ load("@com_github_ash2k_bazel_tools//goimports:deps.bzl", "goimports_dependencies")

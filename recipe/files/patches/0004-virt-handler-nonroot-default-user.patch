@@ -1,0 +1,16 @@
+ReadyStack 0004: virt-handler's image defaults to a non-root user (qemu, uid 107).
+
+ReadyStack images never default to root (owner 2026-10-28). virt-handler still runs as root: the KubeVirt CR in the
+install bundle sets runAsUser: 0 on its container (spec.customizeComponents). One line in cmd/virt-handler/BUILD.bazel.
+
+--- a/cmd/virt-handler/BUILD.bazel
++++ b/cmd/virt-handler/BUILD.bazel
+@@ -201,5 +201,8 @@
+     tars = [
+         "virt-handler-tar",
+     ],
++    # ReadyStack: non-root default user (qemu, uid 107). virt-handler gets root from its pod: runAsUser 0 is set
++    # through the KubeVirt CR spec.customizeComponents patch shipped in the install bundle.
++    user = "107",
+     visibility = ["//visibility:public"],
+ )
